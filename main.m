@@ -31,18 +31,18 @@ actualtime = 0;
 hx=Lx/nx;
 hy=Ly/ny;
 %% Memory allocation to matrices
-utemp = zeros(nx+1,ny+1);
-vtemp = zeros(nx+1,ny+1);
-u = zeros(nx+1,ny+1);
-v = zeros(nx+1,ny+1);
-p = zeros(nx+1,ny+1);
-R = zeros(nx,1);
+utemp = zeros(nx+2,ny+2);
+vtemp = zeros(nx+2,ny+2);
+u = zeros(nx+2,ny+2);
+v = zeros(nx+2,ny+2);
+p = zeros(nx+2,ny+2);
+R = zeros(nx*ny,1);
 L=zeros(nx*ny,nx*ny);
 
 %% Laplacian operator
 L = Laplacian(L,nx,ny,hx,hy);
 % Set pressure BC
-L(1,:)=0; L(1,1)=1;
+%L(1,:)=0; L(1,1)=1;
 %% time loop warning for too large timestep
 if (max(max(u)))*dt/hx >= 1 || (max(max(v)))*dt/hy >= 1
     disp ('timestep too large, divergence may occur')
@@ -55,8 +55,8 @@ else
         % BC wall
         u(1,:)=0;
         v(1,:)=0;
-        u(nx+1,:)=0;
-        v(nx+1,:)=0;
+        u(nx+2,:)=0;
+        v(nx+2,:)=0;
         %% temporary velocity calculation (predictor step)
         [utemp,vtemp]=predictor(utemp,vtemp,u,v,nx,ny,hx,hy,nu,dt);
         %Gaussian Layer
@@ -71,7 +71,6 @@ else
                      +(vtemp(i,j+1)-vtemp(i,j))*hy);
             end
         end
-        R(nx+1,1)=R(nx,1);
         %% solve pressure
         % pressure solve with Laplacian pv = L\RHS
         % pv is a vector including the pressure value of every cell
@@ -91,26 +90,27 @@ else
         u(:,nx+1) = u(:,nx);
         v(:,nx+1) = v(:,nx);    
         %% plot
-        figure(1); clf(1);
-        title('Velocity & Pressure Field','fontsize',20);
-        xlim([0,Lx]);
-        ylim([0,Ly]);
-        hold on
-        
-        x (2:nx+2)=linspace(0,Lx,nx+1);
-        y (2:ny+2)=linspace(0,Ly,ny+1);
-        
-        contourf(x(2:nx+1),y(2:ny+1),p(2:nx+1,2:ny+1)');
-        quiver(x(2:nx+1),y(2:ny+1),...
-            u(2:nx+1,2:ny+1)',v(2:nx+1,2:ny+1)','filled', 'k');
-        xmax=Lx-hx;
-        ymax=Ly-hy;
-        % Set Limits on X & Y Axis
-        xlim([0 xmax]);
-        ylim([0 ymax]);
-        col = colorbar;
-        col.Label.String = 'Pressure (Pa)';
-        drawnow
+%         figure(1); clf(1);
+%         title('Velocity & Pressure Field','fontsize',20);
+%         xlim([0,Lx]);
+%         ylim([0,Ly]);
+%         hold on
+%         
+         x (2:nx+2)=linspace(0,Lx,nx+1);
+         y (2:ny+2)=linspace(0,Ly,ny+1);
+%         
+%         contourf(x(2:nx+1),y(2:ny+1),p(2:nx+1,2:ny+1)');
+%         quiver(x(2:nx+1),y(2:ny+1),...
+%             u(2:nx+1,2:ny+1)',v(2:nx+1,2:ny+1)','filled', 'k');
+%         xmax=Lx-hx;
+%         ymax=Ly-hy;
+%         % Set Limits on X & Y Axis
+%         xlim([0 xmax]);
+%         ylim([0 ymax]);
+%         col = colorbar;
+%         col.Label.String = 'Pressure (Pa)';
+%         drawnow
+        plot (u(10,:),y)
         pause(0.01)
         %% timestep end
         actualtime = actualtime + dt;
